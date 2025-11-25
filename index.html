@@ -6,18 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root{
-      --bg1:#fef9c3;   /* soft yellow */
-      --bg2:#e0f2fe;   /* icy blue   */
-      --bg3:#e5e7eb;   /* light gray */
+      --bg1:#fef9c3;
+      --bg2:#e0f2fe;
+      --bg3:#e5e7eb;
 
       --card:#ffffff;
       --ink:#111827;
-      --accent:#b91c1c;   /* Christmas red */
-      --accent-2:#15803d; /* Christmas green */
+      --accent:#b91c1c;
+      --accent-2:#15803d;
       --muted:#6b7280;
       --good:#16a34a;
       --bad:#b91c1c;
-      --slot:#e5e7eb;
     }
 
     *{ box-sizing:border-box; }
@@ -153,47 +152,61 @@
       font-size:.95rem;
       padding:0 .4rem;
     }
-    #target-word{
-      text-align:center;
-      font-size:1.5rem;
-      font-weight:800;
-      letter-spacing:.25em;
-      color:#9ca3af;
-      margin-bottom:.5rem;
-      text-transform:uppercase;
-    }
 
-    .build-row{
+    #build-row{
       display:flex;
       flex-wrap:wrap;
       justify-content:center;
       gap:.45rem;
-      padding:.2rem .2rem;
+      padding:.25rem .2rem;
     }
 
     .slot{
-      width:3rem;
-      height:3rem;
-      border-radius:.8rem;
-      background:var(--slot);
-      border:3px solid #d1d5db;
+      width:3.4rem;
+      height:3.4rem;
+      border-radius:.9rem;
+      border:3px solid #9ca3af;
+      flex:0 0 auto;
+      position:relative;
+      overflow:hidden;
+      /* LEGO baseplate dots */
+      background-color:#f3f4f6;
+      background-image:
+        radial-gradient(circle,#d1d5db 22%,transparent 24%),
+        radial-gradient(circle,#d1d5db 22%,transparent 24%);
+      background-size:10px 10px;
+      background-position:0 0,5px 5px;
+      box-shadow:0 0 0 3px #e5e7eb;
+    }
+
+    .slot.filled{
+      border-color:#4ade80;
+      box-shadow:0 0 0 3px #bbf7d0;
+    }
+
+    .slot-letter{
+      position:absolute;
+      inset:0;
       display:flex;
       align-items:center;
       justify-content:center;
+      font-size:2rem;
+      font-weight:900;
+      color:#4b5563;
+      text-shadow:0 2px 0 #f9fafb;
+      pointer-events:none;
+      mix-blend-mode:multiply;
+      text-transform:uppercase;
+    }
+
+    .slot-spot{
       position:relative;
-      box-shadow:inset 0 0 0 4px #e5e7eb;
-      flex:0 0 auto;
-    }
-    .slot::before{
-      content:"";
-      width:72%;
-      height:72%;
-      border-radius:.55rem;
-      border:4px dotted rgba(148,163,184,.7);
-      box-sizing:border-box;
-    }
-    .slot.filled{
-      background:#fef2f2;
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:1;
     }
 
     /* LETTER BANK */
@@ -219,23 +232,19 @@
       border-radius:1rem;
       background:#eef2ff;
       border:1px solid #c7d2fe;
-      min-height:3.4rem;
+      min-height:3.6rem;
     }
 
     .brick{
-      width:3rem;
-      height:3rem;
-      border-radius:.9rem;
+      width:3.2rem;
+      height:3.2rem;
+      border-radius:1rem;
       background:linear-gradient(145deg,#fecaca,#f97373);
       box-shadow:0 6px 0 #b91c1c,0 9px 16px rgba(148,27,45,.45);
       border:2px solid #fee2e2;
-      color:#111827;
-      font-weight:900;
-      font-size:1.6rem;
       display:flex;
       align-items:center;
       justify-content:center;
-      text-transform:uppercase;
       cursor:grab;
       position:relative;
       flex:0 0 auto;
@@ -245,7 +254,9 @@
       transform:translateY(1px);
       box-shadow:0 4px 0 #b91c1c,0 7px 14px rgba(148,27,45,.55);
     }
-    .brick::before,.brick::after{
+    /* studs on bricks */
+    .brick::before,
+    .brick::after{
       content:"";
       position:absolute;
       width:70%;
@@ -298,7 +309,7 @@
     #type-feedback.good{ color:var(--good); }
     #type-feedback.bad{ color:var(--bad); }
 
-    /* MESSAGES & BOTTOM ROW */
+    /* MESSAGES & BOTTOM */
     #message{
       margin-top:.6rem;
       font-weight:600;
@@ -328,11 +339,15 @@
     }
 
     @media (max-width:640px){
-      .brick,.slot{
-        width:2.6rem;
-        height:2.6rem;
+      .slot{
+        width:3rem;
+        height:3rem;
       }
-      #target-word{ font-size:1.3rem; }
+      .slot-letter{ font-size:1.7rem; }
+      .brick{
+        width:3rem;
+        height:3rem;
+      }
       .bottom-row{
         flex-direction:column-reverse;
         align-items:stretch;
@@ -347,7 +362,7 @@
 <body>
   <div class="app">
     <h1>Build & Type: Christmas & Winter Words</h1>
-    <p class="tagline">Drag the LEGO-style bricks to build the word, then type it!</p>
+    <p class="tagline">Color in the LEGO word with blocks, then type it!</p>
 
     <div class="card">
       <!-- START SCREEN -->
@@ -365,15 +380,14 @@
         </div>
 
         <div class="build-area">
-          <p class="build-label">Build this word:</p>
-          <div id="target-word"></div>
-          <div id="build-row" class="build-row"></div>
+          <p class="build-label">Build (color in) this LEGO word:</p>
+          <div id="build-row"></div>
         </div>
 
         <div class="letter-bank-wrap">
           <div class="bank-label">
-            <span>Letter bricks</span>
-            <span style="font-size:.8rem;">Drag them into the boxes above.</span>
+            <span>Blocks</span>
+            <span style="font-size:.8rem;">Drag the blocks onto each letter.</span>
           </div>
           <div id="letter-bank" class="letter-bank"></div>
         </div>
@@ -420,7 +434,6 @@
     const gradeLabel    = document.getElementById("grade-label");
     const wordIndexEl   = document.getElementById("word-index");
     const wordTotalEl   = document.getElementById("word-total");
-    const targetWordEl  = document.getElementById("target-word");
     const buildRow      = document.getElementById("build-row");
     const letterBank    = document.getElementById("letter-bank");
     const typeSection   = document.getElementById("type-section");
@@ -441,7 +454,7 @@
       });
     });
 
-    // Letter bank global drop / dragover
+    // Allow dropping back into bank
     letterBank.addEventListener("dragover", handleDragOver);
     letterBank.addEventListener("drop", handleDropOnBank);
 
@@ -470,40 +483,45 @@
       buildRow.innerHTML = "";
       letterBank.innerHTML = "";
 
-      targetWordEl.textContent = currentWord.toUpperCase();
-
-      // Build slots
+      // LEGO letter template: one slot per letter
       for(let i=0;i<currentWord.length;i++){
+        const letter = currentWord[i].toUpperCase();
+
         const slot = document.createElement("div");
         slot.className = "slot";
         slot.dataset.index = i;
+
+        const letterSpan = document.createElement("span");
+        letterSpan.className = "slot-letter";
+        letterSpan.textContent = letter;
+
+        const spot = document.createElement("div");
+        spot.className = "slot-spot";
+
+        slot.appendChild(letterSpan);
+        slot.appendChild(spot);
+
         slot.addEventListener("dragover", handleDragOver);
         slot.addEventListener("drop", handleDropOnSlot);
+
         buildRow.appendChild(slot);
       }
 
-      // Bricks: letters + 2 random distractors
-      const letters = currentWord.split("");
-      const alphabet = "abcdefghijklmnopqrstuvwxyz";
-      for(let i=0;i<2;i++){
-        letters.push(alphabet[Math.floor(Math.random()*alphabet.length)]);
-      }
-      shuffleArray(letters);
-      letters.forEach(letter=>{
-        const brick = createBrick(letter);
+      // Blocks: one for each letter + a couple extras
+      const totalBricks = currentWord.length + 2;
+      for(let i=0;i<totalBricks;i++){
+        const brick = createBrick();
         letterBank.appendChild(brick);
-      });
+      }
 
       messageEl.textContent =
-        "Build the word by dragging the bricks into the boxes.";
+        "Drag the blocks onto each letter to color in the word.";
     }
 
-    function createBrick(letter){
+    function createBrick(){
       const brick = document.createElement("div");
       brick.className = "brick";
-      brick.textContent = letter;
       brick.draggable = true;
-      brick.dataset.letter = letter;
       brickIdCounter++;
       brick.id = "brick-" + brickIdCounter;
       brick.addEventListener("dragstart", handleDragStart);
@@ -515,9 +533,11 @@
       e.dataTransfer.setData("text/plain", e.target.id);
       setTimeout(()=>{ e.target.style.opacity = "0.4"; },0);
     }
+
     function handleDragEnd(e){
       e.target.style.opacity = "1";
     }
+
     function handleDragOver(e){
       e.preventDefault();
     }
@@ -525,16 +545,16 @@
     function handleDropOnSlot(e){
       e.preventDefault();
       const slot = e.currentTarget;
+      const spot = slot.querySelector(".slot-spot");
       const brickId = e.dataTransfer.getData("text/plain");
       const brick = document.getElementById(brickId);
       if(!brick) return;
 
-      // If slot already filled, send its brick back to bank
-      if(slot.firstElementChild){
-        letterBank.appendChild(slot.firstElementChild);
+      // If there's already a brick here, send it back to the bank
+      if(spot.firstElementChild){
+        letterBank.appendChild(spot.firstElementChild);
       }
-      slot.innerHTML = "";
-      slot.appendChild(brick);
+      spot.appendChild(brick);
       slot.classList.add("filled");
       checkBuiltWord();
     }
@@ -546,34 +566,29 @@
       if(!brick) return;
       letterBank.appendChild(brick);
 
-      // Clean filled style on emptied slots
+      // Remove "filled" style from any now-empty slots
       document.querySelectorAll(".slot").forEach(slot=>{
-        if(!slot.firstElementChild){
+        const spot = slot.querySelector(".slot-spot");
+        if(!spot.firstElementChild){
           slot.classList.remove("filled");
         }
       });
-      checkBuiltWord(); // might no longer be complete
+      checkBuiltWord();
     }
 
     function checkBuiltWord(){
       const slots = Array.from(document.querySelectorAll(".slot"));
-      let built = "";
       for(const slot of slots){
-        const brick = slot.firstElementChild;
-        if(!brick){
-          messageEl.textContent = "Keep building...";
+        const spot = slot.querySelector(".slot-spot");
+        if(!spot.firstElementChild){
+          messageEl.textContent = "Keep coloring in the word...";
           return;
         }
-        built += brick.dataset.letter;
       }
-      if(built.toLowerCase() === currentWord.toLowerCase()){
-        messageEl.textContent = "Nice building! ✅ Now type the word.";
-        typeSection.classList.remove("hidden");
-        typeInput.focus();
-      }else{
-        messageEl.textContent =
-          "Those bricks spell \"" + built.toUpperCase() + "\". Try again!";
-      }
+      // all slots filled
+      messageEl.textContent = "Nice building! ✅ Now type the word.";
+      typeSection.classList.remove("hidden");
+      typeInput.focus();
     }
 
     checkTypedBtn.addEventListener("click", checkTypedWord);
@@ -614,14 +629,6 @@
       gameScreen.classList.add("hidden");
       startScreen.classList.remove("hidden");
     });
-
-    function shuffleArray(arr){
-      for(let i=arr.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [arr[i],arr[j]] = [arr[j],arr[i]];
-      }
-      return arr;
-    }
   </script>
 </body>
 </html>
